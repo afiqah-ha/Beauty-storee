@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beauty Store Chatbot</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #ffe6f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .chat-container {
+    width: 350px;
+    max-height: 600px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .chat-header {
+    background: #ff4d94;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+  }
+  .chat-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    background: #fff0f6;
+  }
+  .message {
+    margin-bottom: 15px;
+    display: flex;
+  }
+  .user-message {
+    justify-content: flex-end;
+  }
+  .bot-message {
+    justify-content: flex-start;
+  }
+  .message-text {
+    max-width: 70%;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+  }
+  .user-message .message-text {
+    background: #ffb3d1;
+    color: #000;
+  }
+  .bot-message .message-text {
+    background: #ff4d94;
+    color: #fff;
+  }
+  .chat-input {
+    display: flex;
+    border-top: 1px solid #ddd;
+    padding: 10px;
+    background: #ffe6f0;
+  }
+  .chat-input input {
+    flex: 1;
+    padding: 10px 15px;
+    border-radius: 20px;
+    border: 1px solid #ffb3d1;
+    outline: none;
+  }
+  .chat-input button {
+    background: #ff4d94;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    margin-left: 10px;
+    border-radius: 20px;
+    cursor: pointer;
+  }
+  .product-list {
+    margin-top: 5px;
+  }
+  .product-item {
+    background: #ffcce6;
+    color: #000;
+    padding: 5px 10px;
+    margin: 5px 0;
+    border-radius: 10px;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="chat-header">Beauty Store Chatbot</div>
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="chat-input">
+    <input type="text" id="userInput" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script>
+  const chatMessages = document.getElementById('chatMessages');
+  const userInput = document.getElementById('userInput');
+
+  // Skincare products and prices
+  const skincareProducts = [
+    {name: "Glow Moisturizer", price: "₹499"},
+    {name: "Vitamin C Serum", price: "₹699"},
+    {name: "Gentle Face Cleanser", price: "₹399"},
+    {name: "Hydrating Toner", price: "₹299"},
+    {name: "Night Repair Cream", price: "₹799"}
+  ];
+
+  function appendMessage(text, sender, isProduct = false) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
+    const messageText = document.createElement('div');
+    messageText.classList.add('message-text');
+    
+    if(isProduct) {
+      let html = text + "<div class='product-list'>";
+      skincareProducts.forEach(p => {
+        html += `<div class='product-item'>${p.name} - ${p.price}</div>`;
+      });
+      html += "</div>";
+      messageText.innerHTML = html;
+    } else {
+      messageText.innerText = text;
+    }
+    
+    messageDiv.appendChild(messageText);
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function sendMessage() {
+    const userText = userInput.value.trim();
+    if (userText === "") return;
+    appendMessage(userText, 'user');
+
+    const lowerText = userText.toLowerCase();
+    let botReply = "Sorry, I didn't understand that. Can you ask something else? 🤔";
+    let showProducts = false;
+
+    // Flexible responses
+    if (/hello|hi|hey/.test(lowerText)) {
+      botReply = "Hi there! Welcome to our Beauty Store 💄. How can I help you today?";
+    } else if (/product|show|list|what.*have|price/.test(lowerText)) {
+      botReply = "Here are our skincare products and their prices:";
+      showProducts = true;
+    } else if (/skincare/.test(lowerText)) {
+      botReply = "Here are our skincare products and their prices:";
+      showProducts = true;
+    } else if (/offer|discount|sale/.test(lowerText)) {
+      botReply = "Currently we have 20% off on all lipsticks and 15% off on skincare sets!";
+    } else if (/hour|open|timings/.test(lowerText)) {
+      botReply = "We are open Monday to Saturday, 9 AM to 9 PM. Sunday 10 AM to 6 PM.";
+    } else if (/location|where/.test(lowerText)) {
+      botReply = "We are located at 123 Beauty Street, Glam City.";
+    }
+
+    setTimeout(() => {
+      appendMessage(botReply, 'bot', showProducts);
+    }, 500);
+
+    userInput.value = "";
+  }
+
+  // Press Enter to send
+  userInput.addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+      sendMessage();
+    }
+  });
+
+  // Initial greeting
+  appendMessage("Hi! I'm your Beauty Store assistant. Ask me about skincare products, offers, or store info.", 'bot');
+</script>
+
+</body>
+</html>
